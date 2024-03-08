@@ -1,0 +1,28 @@
+# Get IOP measurement data from the clipboard
+data<-read.delim("clipboard")
+View(data)
+
+# Install the "devtools"" packages
+library(devtools)
+devtools::install_github("deepankardatta/blandr")
+
+# Loading the required library
+library(blandr)
+library(ggplot2)
+
+#Calculate the differences and means
+cal_data<-transform(data,diff=Stand-New,mean=(Stand+New)/2)
+
+#Check of normality of differences
+shapiro.test(cal_data$diff)
+
+#Display the Bland-Altman analysis
+stats.data <- blandr.statistics(cal_data$Stand, cal_data$New, sig.level=0.95)
+summary(stats.data)
+
+#Draw the density histogram and QQ plot
+blandr.plot.normality(stats.data)
+blandr.plot.qq(stats.data)
+
+#Draw the Bland-Altman plots
+blandr.draw(cal_data$Stand, cal_data$New, plotTitle = "Bland-Altman plot for comparison of Stand and New Methods IOP measurement", plotter="rplot")
